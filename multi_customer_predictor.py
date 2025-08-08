@@ -16,7 +16,7 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
 
     # Step 2: Feature Engineering
     df['ArrearsRatio'] = (df['Principal Arrears'] + df['Interest Arrears']) / (df['Outstanding'] + 1)
-    df['SavingsToSalary'] = (df['Compulsory saving'] + df['Voluntary Saving']) / (df['Salary'] + 1)
+    df['SavingsToSalary'] = (df['Compulsory saving'] + df['voluntary saving']) / (df['Salary'] + 1)
     df['InstallmentRatio'] = df['Payment plan'] / (df['Salary'] + 1)
     df.replace([np.inf, -np.inf], 0, inplace=True)
 
@@ -31,7 +31,7 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
         'Remaining Period': 'mean',
         'Periodicity': 'mean',
         'Compulsory saving': 'sum',
-        'Voluntary Saving': 'sum',
+        'voluntary saving': 'sum',
         'Collateral': 'mean',
         'Salary': 'mean',
         'ArrearsRatio': 'mean',
@@ -43,7 +43,7 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
     features = [
         'Outstanding', 'Principal Arrears', 'Interest Arrears', 'Payment plan',
         'DaysInArrears', 'Duration', 'Remaining Period', 'Periodicity',
-        'Compulsory saving', 'Voluntary Saving', 'Collateral', 'Salary',
+        'Compulsory saving', 'voluntary saving', 'Collateral', 'Salary',
         'ArrearsRatio', 'SavingsToSalary', 'InstallmentRatio'
     ]
     X = agg_df[features]
@@ -58,7 +58,7 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
         elif score < 670: return "Fair"
         elif score < 740: return "Good"
         elif score < 800: return "Very Good"
-        else: return "Exceptional"
+        else: return "Excepttional"
 
     fico_bands = [score_to_band(score) for score in predictions]
 
@@ -74,7 +74,7 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
     print(result_df)
     #agg_df["Predicted Credit Score"] = np.round(predictions, 2)
     #agg_df["FICO Band"] = fico_bands
-    #agg_df["Comment"] = "Predicted using full customer history"
+ 
 
     #agg_df.to_excel(output_path, index=False)
     #return agg_df[['Account', 'Predicted Credit Score', 'FICO Band']]#removed "Comment" for simplicity
