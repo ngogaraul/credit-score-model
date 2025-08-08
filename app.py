@@ -9,7 +9,10 @@ from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
 # Load dataset
-df = pd.read_excel("C:/Users/bngog/Desktop/intern/synthetic_credit_data_10000_rows.xlsx")
+df = pd.read_excel("C:/Users/bngog/Desktop/intern/css pj/large_synthetic_test_dataset.xlsx")
+# Ensure 'Account' column is not empty or NaN
+df=df[df['Account'].notna()]
+df=df[df['Account'] != '']  
 
 # Drop completely empty rows (if any)
 df.dropna(how='all', inplace=True)
@@ -17,7 +20,11 @@ df.dropna(how='all', inplace=True)
 # Step 1: Simulate Credit Score
 def simulate_score(row):
     score = 850
-    score -= np.nan_to_num(row['DaysInArrears']) * 2
+    days= np.nan_to_num(row['DaysInArrears'])
+    if days > 0:
+        score -= days * 2
+    else:
+        score += max(30 - days,0)* 0.5
     score -= np.nan_to_num(row['Principal Arrears'] + row['Interest Arrears']) * 0.0005
     score -= (np.nan_to_num(row['Outstanding']) / 1e5) * 1.5
     score += np.nan_to_num(row['Salary']) / 1e5
@@ -64,6 +71,17 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, 
 model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
+#predict on the test set
+y_pred = model.predict(X_test)
+
+# Step 7: Evaluate Model
+mean_squared_error_value = mean_squared_error(y_test, y_pred)
+r2=r2_score(y_test, y_pred)
+
+print(f"Test RMSE: {mean_squared_error_value**0.5:.2f}")
+print(f"Test R²: {r2:.2f}")
+
+
 # Step 7: Predict and Aggregate 
 predictions = model.predict(X_scaled)
 #print(predictions  )
@@ -84,7 +102,7 @@ final_result = {
     "Account": int(df['Account'].dropna().iloc[0]),
     "Predicted Credit Score": final_score,
     "FICO Band": fico_band,
-    "Comment": "Model trained using this person's 10,000 records only"
+
 }
 
 print(final_result)

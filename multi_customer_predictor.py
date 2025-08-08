@@ -63,9 +63,18 @@ def load_model_and_predict_for_multiple_customers(data_path, model_path, scaler_
     fico_bands = [score_to_band(score) for score in predictions]
 
     # Step 7: Save results
-    agg_df["Predicted Credit Score"] = np.round(predictions, 2)
-    agg_df["FICO Band"] = fico_bands
+    result_df = pd.DataFrame({
+        "Account": agg_df["Account"],
+        "FICO Score": np.round(predictions, 2),
+        "FICO Band": [score_to_band(score) for score in predictions]
+    })
+
+    result_df.to_excel(output_path, index=False)
+    return result_df
+    print(result_df)
+    #agg_df["Predicted Credit Score"] = np.round(predictions, 2)
+    #agg_df["FICO Band"] = fico_bands
     #agg_df["Comment"] = "Predicted using full customer history"
 
-    agg_df.to_excel(output_path, index=False)
-    return agg_df[['Account', 'Predicted Credit Score', 'FICO Band']]#removed "Comment" for simplicity
+    #agg_df.to_excel(output_path, index=False)
+    #return agg_df[['Account', 'Predicted Credit Score', 'FICO Band']]#removed "Comment" for simplicity
